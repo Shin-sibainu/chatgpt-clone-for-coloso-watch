@@ -4,7 +4,10 @@ import ChatArea from "./components/ChatArea";
 import Sidebar from "./components/Sidebar";
 
 import { useAuth } from "./context/AuthContextProvider";
-import { getChatRoomsForUser } from "./utils/chatServices";
+import {
+  getChatRoomsForUser,
+  getMessagesForChatRoom,
+} from "./utils/chatServices";
 
 //https://www.twitterbio.io/
 //colosotestdb
@@ -16,44 +19,76 @@ export interface ChatRoom {
   created_at: string;
 }
 
+export interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  is_ai: boolean;
+}
+
 function App() {
   const { user } = useAuth();
 
   const [chatRooms, setChatRooms] = useState<ChatRoom[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedChatRoom, setSelectedChatRoom] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[] | null>(null);
 
+  /* get chat rooms */
   useEffect(() => {
     //chat room create
     async function fetchChatRooms() {
       if (user?.id) {
         try {
-          setIsLoading(true);
           const rooms = await getChatRoomsForUser(
             "1f76b526-c372-4f66-95b2-b4809e92c1fd"
           );
-          console.log(rooms);
           setChatRooms(rooms);
+
+          //chat roomがあれば一番目を選択する。
+          if (rooms.length > 0 && !selectedChatRoom) {
+            setSelectedChatRoom(rooms[0].id);
+          }
         } catch (error) {
           console.error("Failed to fetch chat rooms:", error);
-        } finally {
-          setIsLoading(false);
         }
       }
     }
 
     fetchChatRooms();
-  }, [user?.id]);
+  }, [user?.id, selectedChatRoom]);
+
+  /* get messages for chatroomId */
+  useEffect(() => {
+    async function fetchMessages() {
+      if (selectedChatRoom) {
+        try {
+          const fetchedMessages = await getMessagesForChatRoom(
+            selectedChatRoom
+          );
+          setMessages(fetchedMessages);
+        } catch (error) {
+          console.error("Failed to fetch messages:", error);
+        }
+      }
+    }
+
+    fetchMessages();
+  }, [selectedChatRoom]);
 
   return (
     <>
       {user ? (
         <main className="md:flex w-screen h-screen">
           <div className="lg:w-1/6 md:w-1/3">
-            <Sidebar chatRooms={chatRooms} />
+            <Sidebar
+              chatRooms={chatRooms}
+              onRoomSelect={setSelectedChatRoom}
+            />
           </div>
 
           <div className="lg:w-5/6 md:w-2/3">
-            <ChatArea />
+            <ChatArea messages={messages} />
           </div>
         </main>
       ) : (

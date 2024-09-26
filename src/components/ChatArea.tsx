@@ -1,7 +1,12 @@
+import { Message } from "../App";
 import { useAuth } from "../context/AuthContextProvider";
 import ChatInput from "./ChatInput";
 
-const ChatArea = () => {
+type ChatAreaProps = {
+  messages: Message[] | null;
+};
+
+const ChatArea = ({ messages }: ChatAreaProps) => {
   const { user, signOut } = useAuth();
 
   return (
@@ -29,31 +34,53 @@ const ChatArea = () => {
         <div className="w-full max-w-3xl flex flex-col">
           {/* chat output area */}
           <div className="flex-grow overflow-y-auto mb-4">
+            {messages?.map((message) => (
+              <>
+                {message.is_ai ? (
+                  <div className="mb-6 flex items-center gap-2 relative">
+                    <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
+                      <span className="text-white text-sm font-semibold">
+                        AI
+                      </span>
+                    </div>
+                    <div className="inline-block rounded-lg p-2">
+                      Hi ShinCode! What's up!
+                    </div>
+                  </div>
+                ) : (
+                  <div className={"text-right mb-6"}>
+                    <div className="inline-block bg-zinc-700 rounded-lg p-2">
+                      {message.content}
+                    </div>
+                  </div>
+                )}
+              </>
+            ))}
             {/* right chat (me) */}
-            <div className="text-right mb-6">
+            {/* <div className="text-right mb-6">
               <div className="inline-block bg-zinc-700 rounded-lg p-2">Hi</div>
-            </div>
+            </div> */}
 
             {/* left chat (ai) */}
-            <div className="mb-6 flex items-center gap-2 relative">
+            {/* <div className="mb-6 flex items-center gap-2 relative">
               <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">AI</span>
               </div>
               <div className="inline-block rounded-lg p-2">
                 Hi ShinCode! What's up!
               </div>
-            </div>
+            </div> */}
 
             {/* right chat (me) */}
-            <div className="text-right mb-6">
+            {/* <div className="text-right mb-6">
               <div className="inline-block bg-zinc-700 rounded-lg p-2">
                 I want to ask about a React Application. How to use React Hooks
                 like useState or useEffect?
               </div>
-            </div>
+            </div> */}
 
             {/* left chat (ai) */}
-            <div className="mb-6 flex items-center gap-2 relative">
+            {/* <div className="mb-6 flex items-center gap-2 relative">
               <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">AI</span>
               </div>
@@ -61,21 +88,21 @@ const ChatArea = () => {
                 React Hooks like useState and useEffect allow you to add state
                 and side effects to functional components.
               </div>
-            </div>
+            </div> */}
 
             {/* right chat (me) */}
-            <div className="text-right mb-6">
+            {/* <div className="text-right mb-6">
               <div className="inline-block bg-zinc-700 rounded-lg p-2">
                 I see. Thank you for your help!
               </div>
-            </div>
+            </div> */}
 
-            <div className="mb-6 flex items-center gap-2 relative">
+            {/* <div className="mb-6 flex items-center gap-2 relative">
               <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">AI</span>
               </div>
               <div className="inline-block rounded-lg p-2">Your Welcome!</div>
-            </div>
+            </div> */}
           </div>
 
           {/* chat input */}

@@ -1,10 +1,21 @@
+import { useState } from "react";
 import { ChatRoom } from "../App";
 
 type SidebarProps = {
   chatRooms: ChatRoom[] | null;
+  onRoomSelect: (roomId: string) => void;
 };
 
-const Sidebar = ({ chatRooms }: SidebarProps) => {
+const Sidebar = ({ chatRooms, onRoomSelect }: SidebarProps) => {
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState<string | null>(
+    null
+  );
+
+  const handleRoomSelect = (roomId: string) => {
+    setSelectedChatRoomId(roomId);
+    onRoomSelect(roomId);
+  };
+
   return (
     <div className="flex flex-col gap-4 bg-zinc-900 p-4 text-white h-full">
       {/* create chat room */}
@@ -20,7 +31,12 @@ const Sidebar = ({ chatRooms }: SidebarProps) => {
           {chatRooms?.map((chatRoom) => (
             <li
               key={chatRoom.id}
-              className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md"
+              onClick={() => handleRoomSelect(chatRoom.id)}
+              className={`hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md ${
+                selectedChatRoomId === chatRoom.id
+                  ? "bg-slate-600"
+                  : "bg-transparent"
+              }`}
             >
               {chatRoom.name}
             </li>

@@ -29,4 +29,27 @@ export async function getChatRoomsForUser(userId: string) {
   }
 }
 
-export async function getMessages(userId: string) {}
+export async function getMessagesForChatRoom(chatRoomId: string, limit = 20) {
+  if (!chatRoomId) {
+    throw new Error("chatRoomId is required");
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("messages")
+      .select(`id, content, created_at, user_id, is_ai`)
+      .eq("chat_room_id", chatRoomId)
+      .order("created_at", { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      console.error("Error fetching messages:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in getMessagesForChatRoom:", error);
+    throw error;
+  }
+}
