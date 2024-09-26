@@ -1,4 +1,10 @@
-const Sidebar = () => {
+import { ChatRoom } from "../App";
+
+type SidebarProps = {
+  chatRooms: ChatRoom[] | null;
+};
+
+const Sidebar = ({ chatRooms }: SidebarProps) => {
   return (
     <div className="flex flex-col gap-4 bg-zinc-900 p-4 text-white h-full">
       {/* create chat room */}
@@ -11,18 +17,14 @@ const Sidebar = () => {
       {/* chat room lists */}
       <nav>
         <ul className="space-y-2">
-          <li className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md">
-            Test Room1
-          </li>
-          <li className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md">
-            Test Room2
-          </li>
-          <li className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md">
-            Test Room3
-          </li>
-          <li className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md">
-            Test Room4
-          </li>
+          {chatRooms?.map((chatRoom) => (
+            <li
+              key={chatRoom.id}
+              className="hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md"
+            >
+              {chatRoom.name}
+            </li>
+          ))}
         </ul>
       </nav>
     </div>
