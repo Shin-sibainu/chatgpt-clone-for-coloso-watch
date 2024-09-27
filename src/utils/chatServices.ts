@@ -53,3 +53,33 @@ export async function getMessagesForChatRoom(chatRoomId: number, limit = 20) {
     throw error;
   }
 }
+
+export async function sendMessage(
+  userId: string | undefined,
+  chatRoomId: number,
+  content: string,
+  isAi?: boolean
+) {
+  try {
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        chat_room_id: chatRoomId,
+        user_id: userId,
+        is_ai: isAi,
+        content: content,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error sending messages:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to sending message:", error);
+    throw error;
+  }
+}

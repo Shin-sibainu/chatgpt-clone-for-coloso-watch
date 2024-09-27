@@ -1,13 +1,35 @@
+import { useEffect, useState } from "react";
 import { Message } from "../App";
 import { useAuth } from "../context/AuthContextProvider";
 import ChatInput from "./ChatInput";
+import { getMessagesForChatRoom } from "../utils/chatServices";
 
-type ChatAreaProps = {
-  messages: Message[] | null;
-};
+interface ChatAreaProps {
+  selectedChatRoomId: number | null;
+}
 
-const ChatArea = ({ messages }: ChatAreaProps) => {
+const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
   const { user, signOut } = useAuth();
+
+  const [messages, setMessages] = useState<Message[] | null>(null);
+
+  /* get messages for chatroomId */
+  useEffect(() => {
+    async function fetchMessages() {
+      if (selectedChatRoomId) {
+        try {
+          const fetchedMessages = await getMessagesForChatRoom(
+            selectedChatRoomId
+          );
+          setMessages(fetchedMessages);
+        } catch (error) {
+          console.error("Failed to fetch messages:", error);
+        }
+      }
+    }
+
+    fetchMessages();
+  }, [selectedChatRoomId]);
 
   return (
     <div className="h-full p-4 bg-zinc-800 text-white flex flex-col">
@@ -107,7 +129,10 @@ const ChatArea = ({ messages }: ChatAreaProps) => {
 
           {/* chat input */}
           <div className="my-2">
-            <ChatInput />
+            <ChatInput
+              userId={user?.id}
+              selectedChatRoomId={selectedChatRoomId}
+            />
           </div>
         </div>
       </div>

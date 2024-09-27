@@ -4,10 +4,7 @@ import ChatArea from "./components/ChatArea";
 import Sidebar from "./components/Sidebar";
 
 import { useAuth } from "./context/AuthContextProvider";
-import {
-  getChatRoomsForUser,
-  getMessagesForChatRoom,
-} from "./utils/chatServices";
+import { getChatRoomsForUser } from "./utils/chatServices";
 
 //https://www.twitterbio.io/
 //colosotestdb
@@ -34,7 +31,6 @@ function App() {
   const [selectedChatRoomId, setSelectedChatRoomId] = useState<number | null>(
     null
   );
-  const [messages, setMessages] = useState<Message[] | null>(null);
 
   /* get chat rooms */
   useEffect(() => {
@@ -61,24 +57,6 @@ function App() {
     fetchChatRooms();
   }, [user?.id, selectedChatRoomId]);
 
-  /* get messages for chatroomId */
-  useEffect(() => {
-    async function fetchMessages() {
-      if (selectedChatRoomId) {
-        try {
-          const fetchedMessages = await getMessagesForChatRoom(
-            selectedChatRoomId
-          );
-          setMessages(fetchedMessages);
-        } catch (error) {
-          console.error("Failed to fetch messages:", error);
-        }
-      }
-    }
-
-    fetchMessages();
-  }, [selectedChatRoomId]);
-
   return (
     <>
       {user ? (
@@ -92,7 +70,7 @@ function App() {
           </div>
 
           <div className="lg:w-5/6 md:w-2/3">
-            <ChatArea messages={messages} />
+            <ChatArea selectedChatRoomId={selectedChatRoomId} />
           </div>
         </main>
       ) : (
