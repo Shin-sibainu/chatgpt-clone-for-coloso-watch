@@ -29,7 +29,7 @@ export async function getChatRoomsForUser(userId: string) {
   }
 }
 
-export async function getMessagesForChatRoom(chatRoomId: string, limit = 20) {
+export async function getMessagesForChatRoom(chatRoomId: number, limit = 20) {
   if (!chatRoomId) {
     throw new Error("chatRoomId is required");
   }

@@ -1,18 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatRoom } from "../App";
 
 type SidebarProps = {
   chatRooms: ChatRoom[] | null;
-  onRoomSelect: (roomId: string) => void;
+  onRoomSelect: (roomId: number) => void;
+  selectedChatRoomId: number | null;
 };
 
-const Sidebar = ({ chatRooms, onRoomSelect }: SidebarProps) => {
-  const [selectedChatRoomId, setSelectedChatRoomId] = useState<string | null>(
-    null
-  );
+const Sidebar = ({
+  chatRooms,
+  onRoomSelect,
+  selectedChatRoomId,
+}: SidebarProps) => {
+  const [selectedChatRoom, setSelectedChatRoom] = useState<number | null>(null);
 
-  const handleRoomSelect = (roomId: string) => {
-    setSelectedChatRoomId(roomId);
+  useEffect(() => {
+    setSelectedChatRoom(selectedChatRoomId);
+  }, [selectedChatRoomId]);
+
+
+  const handleRoomSelect = (roomId: number) => {
+    setSelectedChatRoom(roomId);
     onRoomSelect(roomId);
   };
 
@@ -33,7 +41,7 @@ const Sidebar = ({ chatRooms, onRoomSelect }: SidebarProps) => {
               key={chatRoom.id}
               onClick={() => handleRoomSelect(chatRoom.id)}
               className={`hover:bg-slate-600 duration-150 cursor-pointer py-2 px-2 rounded-md ${
-                selectedChatRoomId === chatRoom.id
+                selectedChatRoom === chatRoom.id
                   ? "bg-slate-600"
                   : "bg-transparent"
               }`}

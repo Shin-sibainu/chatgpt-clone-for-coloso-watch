@@ -35,7 +35,7 @@ const ChatArea = ({ messages }: ChatAreaProps) => {
           {/* chat output area */}
           <div className="flex-grow overflow-y-auto mb-4">
             {messages?.map((message) => (
-              <>
+              <div key={message.id}>
                 {message.is_ai ? (
                   <div className="mb-6 flex items-center gap-2 relative">
                     <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
@@ -54,7 +54,7 @@ const ChatArea = ({ messages }: ChatAreaProps) => {
                     </div>
                   </div>
                 )}
-              </>
+              </div>
             ))}
             {/* right chat (me) */}
             {/* <div className="text-right mb-6">

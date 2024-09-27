@@ -14,13 +14,13 @@ import {
 //rugyunya@bangban.uk
 
 export interface ChatRoom {
-  id: string;
+  id: number;
   name: string;
   created_at: string;
 }
 
 export interface Message {
-  id: string;
+  id: number;
   content: string;
   created_at: string;
   user_id: string;
@@ -31,7 +31,9 @@ function App() {
   const { user } = useAuth();
 
   const [chatRooms, setChatRooms] = useState<ChatRoom[] | null>(null);
-  const [selectedChatRoom, setSelectedChatRoom] = useState<string | null>(null);
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState<number | null>(
+    null
+  );
   const [messages, setMessages] = useState<Message[] | null>(null);
 
   /* get chat rooms */
@@ -41,13 +43,14 @@ function App() {
       if (user?.id) {
         try {
           const rooms = await getChatRoomsForUser(
-            "1f76b526-c372-4f66-95b2-b4809e92c1fd"
+            // "1f76b526-c372-4f66-95b2-b4809e92c1fd"
+            user.id
           );
           setChatRooms(rooms);
 
           //chat roomがあれば一番目を選択する。
-          if (rooms.length > 0 && !selectedChatRoom) {
-            setSelectedChatRoom(rooms[0].id);
+          if (rooms.length > 0 && !selectedChatRoomId) {
+            setSelectedChatRoomId(rooms[0].id);
           }
         } catch (error) {
           console.error("Failed to fetch chat rooms:", error);
@@ -56,15 +59,15 @@ function App() {
     }
 
     fetchChatRooms();
-  }, [user?.id, selectedChatRoom]);
+  }, [user?.id, selectedChatRoomId]);
 
   /* get messages for chatroomId */
   useEffect(() => {
     async function fetchMessages() {
-      if (selectedChatRoom) {
+      if (selectedChatRoomId) {
         try {
           const fetchedMessages = await getMessagesForChatRoom(
-            selectedChatRoom
+            selectedChatRoomId
           );
           setMessages(fetchedMessages);
         } catch (error) {
@@ -74,7 +77,7 @@ function App() {
     }
 
     fetchMessages();
-  }, [selectedChatRoom]);
+  }, [selectedChatRoomId]);
 
   return (
     <>
@@ -83,7 +86,8 @@ function App() {
           <div className="lg:w-1/6 md:w-1/3">
             <Sidebar
               chatRooms={chatRooms}
-              onRoomSelect={setSelectedChatRoom}
+              onRoomSelect={setSelectedChatRoomId}
+              selectedChatRoomId={selectedChatRoomId}
             />
           </div>
 

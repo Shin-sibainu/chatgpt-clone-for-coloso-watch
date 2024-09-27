@@ -1,0 +1,43 @@
+db schema. 
+:users
+ - id(uuid)
+ - email(text)
+ - full_name(text)
+ - avatar_url(text)
+
+
+:chat_rooms
+ - id(int8) 
+ - name(text)
+ - user_id(uuid) (users.id -> chat_rooms.user_id)
+
+
+:messages
+ - id(int8)
+ - chat_room_id(int8) (chat_rooms.id -> messages.id)
+ - user_id(uuid) (users.id -> messages.id)
+ - is_ai(bool)
+ - content(text)
+
+ 
+ ------------
+functions
+    CREATE OR REPLACE FUNCTION public.handle_new_user()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      INSERT INTO public.users(id, email, full_name, avatar_url)
+      VALUES(
+        NEW.id,
+        NEW.email,
+        NEW.raw_user_meta_data->>'full_name',
+        NEW.raw_user_meta_data->>'avatar_url'
+      );
+      RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+trigger 
+  CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
