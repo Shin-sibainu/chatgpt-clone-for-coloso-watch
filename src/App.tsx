@@ -18,9 +18,9 @@ export interface ChatRoom {
 
 export interface Message {
   id: number;
-  content: string;
+  content: string | null | undefined;
   created_at: string;
-  user_id: string;
+  user_id: string | undefined;
   is_ai: boolean;
 }
 

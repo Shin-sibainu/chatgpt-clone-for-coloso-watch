@@ -1,4 +1,10 @@
+import OpenAI from "openai";
 import { supabase } from "../lib/supabaseClient";
+
+const openai = new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 export async function getChatRoomsForUser(userId: string) {
   if (!userId) {
@@ -57,7 +63,7 @@ export async function getMessagesForChatRoom(chatRoomId: number, limit = 20) {
 export async function sendMessage(
   userId: string | undefined,
   chatRoomId: number,
-  content: string,
+  content: string | null | undefined,
   isAi?: boolean
 ) {
   try {
@@ -81,5 +87,24 @@ export async function sendMessage(
   } catch (error) {
     console.error("Failed to sending message:", error);
     throw error;
+  }
+}
+
+//ai
+export async function sendMessageToGPT(message: string) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "あなたは優秀なアシスタントです。" },
+        { role: "user", content: message },
+      ],
+    });
+
+    const messageFromGPT = completion.choices[0].message.content;
+
+    return messageFromGPT;
+  } catch (error) {
+    console.error("Error in sendMessageToGPT:", error);
   }
 }

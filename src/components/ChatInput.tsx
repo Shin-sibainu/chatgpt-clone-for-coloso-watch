@@ -1,12 +1,18 @@
 import { FormEvent, useState } from "react";
-import { sendMessage } from "../utils/chatServices";
+import { sendMessage, sendMessageToGPT } from "../utils/chatServices";
+import { Message } from "../App";
 
 type ChatInputProps = {
   userId: string | undefined;
   selectedChatRoomId: number | null;
+  setMessages: React.Dispatch<React.SetStateAction<Message[] | null>>;
 };
 
-const ChatInput = ({ userId, selectedChatRoomId }: ChatInputProps) => {
+const ChatInput = ({
+  userId,
+  selectedChatRoomId,
+  setMessages,
+}: ChatInputProps) => {
   const [inputSendMessage, setInputSendMessage] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
@@ -14,8 +20,41 @@ const ChatInput = ({ userId, selectedChatRoomId }: ChatInputProps) => {
     if (inputSendMessage.trim() === "" || !selectedChatRoomId) return;
 
     try {
+      // Add user message
+      const userMessage: Message = {
+        id: Date.now(),
+        content: inputSendMessage,
+        is_ai: false,
+        user_id: userId,
+        created_at: Date.now().toString(),
+      };
+      //optimistic message update
+      setMessages((prevMessages) =>
+        prevMessages ? [...prevMessages, userMessage] : [userMessage]
+      );
+
+      // send yor message to backend
       await sendMessage(userId, selectedChatRoomId, inputSendMessage);
       setInputSendMessage("");
+
+      const messageFromGPT = await sendMessageToGPT(inputSendMessage);
+
+      //Add ai message
+      const aiMessage: Message = {
+        id: Date.now() + 1,
+        content: messageFromGPT,
+        is_ai: true,
+        user_id: undefined,
+        created_at: Date.now().toString(),
+      };
+      //optimistic message update
+      setMessages((prevMessages) =>
+        prevMessages ? [...prevMessages, aiMessage] : [aiMessage]
+      );
+
+      console.log(messageFromGPT);
+      // send ai message to backend
+      await sendMessage(undefined, selectedChatRoomId, messageFromGPT, true);
     } catch (err) {
       alert(err);
     }
