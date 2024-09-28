@@ -4,9 +4,9 @@ import { useAuth } from "../context/AuthContextProvider";
 import ChatInput from "./ChatInput";
 import { getMessagesForChatRoom } from "../utils/chatServices";
 
-interface ChatAreaProps {
+type ChatAreaProps = {
   selectedChatRoomId: number | null;
-}
+};
 
 const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
   const { user, signOut } = useAuth();

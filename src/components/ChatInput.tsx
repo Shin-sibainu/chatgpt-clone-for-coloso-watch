@@ -1,10 +1,10 @@
 import { FormEvent, useState } from "react";
 import { sendMessage } from "../utils/chatServices";
 
-interface ChatInputProps {
+type ChatInputProps = {
   userId: string | undefined;
   selectedChatRoomId: number | null;
-}
+};
 
 const ChatInput = ({ userId, selectedChatRoomId }: ChatInputProps) => {
   const [inputSendMessage, setInputSendMessage] = useState("");
