@@ -58,7 +58,7 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
             <div key={message.id}>
               {message.is_ai ? (
                 <div className="mb-6 flex items-center gap-2 relative">
-                  <div className="bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
+                  <div className="flex-shrink-0 bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">AI</span>
                   </div>
                   <div className="inline-block rounded-lg p-2">
