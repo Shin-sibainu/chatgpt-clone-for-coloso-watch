@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Message } from "../App";
 import { useAuth } from "../context/AuthContextProvider";
 import ChatInput from "./ChatInput";
@@ -12,6 +12,15 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
   const { user, signOut } = useAuth();
 
   const [messages, setMessages] = useState<Message[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, []);
 
   /* get messages for chatroomId */
   useEffect(() => {
@@ -52,7 +61,7 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
       </div>
 
       {/* chat messages area (scrollable) */}
-      <div className="flex-grow overflow-y-auto px-4">
+      <div className="flex-grow overflow-y-auto scrollbar-hide px-4">
         <div className="max-w-3xl mx-auto">
           {messages?.map((message) => (
             <div key={message.id}>
@@ -66,7 +75,7 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
                   </div>
                 </div>
               ) : (
-                <div className={"text-right mb-6"}>
+                <div className="text-right mb-6">
                   <div className="inline-block bg-zinc-700 rounded-lg p-2">
                     {message.content}
                   </div>
@@ -74,6 +83,15 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
               )}
             </div>
           ))}
+          {isLoading && (
+            <div className="mb-6 flex items-center gap-2 relative">
+              <div className="flex-shrink-0 bg-zinc-900 rounded-full size-9 border border-zinc-100 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">AI</span>
+              </div>
+              <div className="inline-block rounded-lg p-2">Loading...</div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
@@ -84,6 +102,8 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
             userId={user?.id}
             selectedChatRoomId={selectedChatRoomId}
             setMessages={setMessages}
+            setIsLoading={setIsLoading}
+            scrollToBottom={scrollToBottom}
           />
         </div>
       </div>

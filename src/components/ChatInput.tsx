@@ -6,12 +6,16 @@ type ChatInputProps = {
   userId: string | undefined;
   selectedChatRoomId: number | null;
   setMessages: React.Dispatch<React.SetStateAction<Message[] | null>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  scrollToBottom: () => void;
 };
 
 const ChatInput = ({
   userId,
   selectedChatRoomId,
   setMessages,
+  setIsLoading,
+  scrollToBottom,
 }: ChatInputProps) => {
   const [inputSendMessage, setInputSendMessage] = useState("");
 
@@ -32,10 +36,13 @@ const ChatInput = ({
       setMessages((prevMessages) =>
         prevMessages ? [...prevMessages, userMessage] : [userMessage]
       );
+      scrollToBottom();
 
       // send yor message to backend
       await sendMessage(userId, selectedChatRoomId, inputSendMessage);
       setInputSendMessage("");
+
+      setIsLoading(true);
 
       const messageFromGPT = await sendMessageToGPT(inputSendMessage);
 
@@ -51,12 +58,16 @@ const ChatInput = ({
       setMessages((prevMessages) =>
         prevMessages ? [...prevMessages, aiMessage] : [aiMessage]
       );
+      // scrollToBottom();
 
-      console.log(messageFromGPT);
       // send ai message to backend
       await sendMessage(undefined, selectedChatRoomId, messageFromGPT, true);
+
+      setIsLoading(false);
     } catch (err) {
       alert(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

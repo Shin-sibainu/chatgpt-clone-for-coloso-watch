@@ -35,7 +35,7 @@ export async function getChatRoomsForUser(userId: string) {
   }
 }
 
-export async function getMessagesForChatRoom(chatRoomId: number, limit = 20) {
+export async function getMessagesForChatRoom(chatRoomId: number) {
   if (!chatRoomId) {
     throw new Error("chatRoomId is required");
   }
@@ -45,8 +45,7 @@ export async function getMessagesForChatRoom(chatRoomId: number, limit = 20) {
       .from("messages")
       .select(`id, content, created_at, user_id, is_ai`)
       .eq("chat_room_id", chatRoomId)
-      .order("created_at", { ascending: true })
-      .limit(limit);
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Error fetching messages:", error);
