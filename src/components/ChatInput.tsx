@@ -21,51 +21,55 @@ const ChatInput = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (inputSendMessage.trim() === "" || !selectedChatRoomId) return;
+    if (inputSendMessage.trim() === "") return;
+
+    if (!userId) {
+      alert("ログインしてください。");
+      return;
+    }
+
+    if (!selectedChatRoomId) {
+      alert("ルームを作成または選択してください。");
+      return;
+    }
 
     try {
-      // Add user message
-      const userMessage: Message = {
-        id: Date.now(),
-        content: inputSendMessage,
-        is_ai: false,
-        user_id: userId,
-        created_at: Date.now().toString(),
-      };
-      //optimistic message update
+      // Send message to backend
+      const sentMessage = await sendMessage(
+        userId,
+        selectedChatRoomId,
+        inputSendMessage
+      );
+
+      // Update messages with the response from the backend
       setMessages((prevMessages) =>
-        prevMessages ? [...prevMessages, userMessage] : [userMessage]
+        prevMessages ? [...prevMessages, sentMessage] : [sentMessage]
       );
       scrollToBottom();
 
-      // send yor message to backend
-      await sendMessage(userId, selectedChatRoomId, inputSendMessage);
       setInputSendMessage("");
 
       setIsLoading(true);
 
       const messageFromGPT = await sendMessageToGPT(inputSendMessage);
 
-      //Add ai message
-      const aiMessage: Message = {
-        id: Date.now() + 1,
-        content: messageFromGPT,
-        is_ai: true,
-        user_id: undefined,
-        created_at: Date.now().toString(),
-      };
-      //optimistic message update
+      // Send AI message to backend
+      const aiMessage = await sendMessage(
+        undefined,
+        selectedChatRoomId,
+        messageFromGPT,
+        true
+      );
+
+      // Update messages with AI response
       setMessages((prevMessages) =>
         prevMessages ? [...prevMessages, aiMessage] : [aiMessage]
       );
-      // scrollToBottom();
-
-      // send ai message to backend
-      await sendMessage(undefined, selectedChatRoomId, messageFromGPT, true);
 
       setIsLoading(false);
     } catch (err) {
-      alert(err);
+      console.error("Error sending message:", err);
+      alert("メッセージの送信に失敗しました。");
     } finally {
       setIsLoading(false);
     }

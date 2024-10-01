@@ -7,12 +7,14 @@ type SidebarProps = {
   chatRooms: ChatRoom[] | null;
   onRoomSelect: (roomId: number) => void;
   selectedChatRoomId: number | null;
+  onRoomCreate: (newRoom: ChatRoom) => void;
 };
 
 const Sidebar = ({
   chatRooms,
   onRoomSelect,
   selectedChatRoomId,
+  onRoomCreate,
 }: SidebarProps) => {
   const { user } = useAuth();
 
@@ -30,8 +32,14 @@ const Sidebar = ({
   const handleCreateChatRoom = async () => {
     const chatRoomName = window.prompt("チャットルーム名を記入してください。");
 
-    if (chatRoomName) {
-      await createChatRoomForUser(user?.id, chatRoomName);
+    if (chatRoomName && user?.id) {
+      try {
+        const newRoom = await createChatRoomForUser(user.id, chatRoomName);
+        onRoomCreate(newRoom);
+      } catch (error) {
+        console.error("Failed to create chat room:", error);
+        alert("チャットルームの作成に失敗しました。");
+      }
     }
   };
 

@@ -57,6 +57,13 @@ function App() {
     fetchChatRooms();
   }, [user?.id, selectedChatRoomId]);
 
+  const handleRoomCreate = (newRoom: ChatRoom) => {
+    setChatRooms((prevRooms) =>
+      prevRooms ? [...prevRooms, newRoom] : [newRoom]
+    );
+    setSelectedChatRoomId(newRoom.id);
+  };
+
   return (
     <>
       {user ? (
@@ -66,6 +73,7 @@ function App() {
               chatRooms={chatRooms}
               onRoomSelect={setSelectedChatRoomId}
               selectedChatRoomId={selectedChatRoomId}
+              onRoomCreate={handleRoomCreate}
             />
           </div>
 

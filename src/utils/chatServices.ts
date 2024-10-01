@@ -113,10 +113,14 @@ export async function createChatRoomForUser(
   chatRoomName: string
 ) {
   try {
-    const { data, error } = await supabase.from("chat_rooms").insert({
-      name: chatRoomName,
-      user_id: userId,
-    });
+    const { data, error } = await supabase
+      .from("chat_rooms")
+      .insert({
+        name: chatRoomName,
+        user_id: userId,
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error("Error create chatRoom:", error);
