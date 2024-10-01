@@ -107,3 +107,25 @@ export async function sendMessageToGPT(message: string) {
     console.error("Error in sendMessageToGPT:", error);
   }
 }
+
+export async function createChatRoomForUser(
+  userId: string | undefined,
+  chatRoomName: string
+) {
+  try {
+    const { data, error } = await supabase.from("chat_rooms").insert({
+      name: chatRoomName,
+      user_id: userId,
+    });
+
+    if (error) {
+      console.error("Error create chatRoom:", error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Failed to create chatRoom:", error);
+    throw error;
+  }
+}
