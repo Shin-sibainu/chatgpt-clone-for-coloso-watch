@@ -67,7 +67,7 @@ function App() {
   return (
     <>
       {user ? (
-        <main className="md:flex w-screen h-screen">
+        <main className="flex flex-col md:flex-row w-screen h-screen">
           <div className="lg:w-1/6 md:w-1/3">
             <Sidebar
               chatRooms={chatRooms}
@@ -77,7 +77,7 @@ function App() {
             />
           </div>
 
-          <div className="lg:w-5/6 md:w-2/3">
+          <div className="lg:w-5/6 md:w-2/3 flex-grow">
             <ChatArea selectedChatRoomId={selectedChatRoomId} />
           </div>
         </main>

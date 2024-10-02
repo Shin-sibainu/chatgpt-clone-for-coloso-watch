@@ -96,7 +96,7 @@ const ChatArea = ({ selectedChatRoomId }: ChatAreaProps) => {
       </div>
 
       {/* chat input area (fixed at bottom) */}
-      <div className="p-4 ">
+      <div className="p-4">
         <div className="max-w-3xl mx-auto">
           <ChatInput
             userId={user?.id}
