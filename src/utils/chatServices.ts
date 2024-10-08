@@ -1,10 +1,4 @@
-import OpenAI from "openai";
 import { supabase } from "../lib/supabaseClient";
-
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
 
 export async function getChatRoomsForUser(userId: string) {
   if (!userId) {
@@ -92,15 +86,24 @@ export async function sendMessage(
 //ai
 export async function sendMessageToGPT(message: string) {
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "あなたは優秀なアシスタントです。" },
-        { role: "user", content: message },
-      ],
-    });
+    const response = await fetch(
+      "https://openai-proxy.vivi-1225-vivi9.workers.dev",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      }
+    );
 
-    const messageFromGPT = completion.choices[0].message.content;
+    if (!response.ok) {
+      throw new Error("API request failed");
+    }
+
+    const data = await response.json();
+
+    const messageFromGPT = data.choices[0].message.content;
 
     return messageFromGPT;
   } catch (error) {
