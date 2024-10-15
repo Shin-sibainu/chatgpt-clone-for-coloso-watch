@@ -44,10 +44,38 @@ trigger
 
 
 RLS policy
-  auth.uid and ai response ok.\
-  ((auth.uid() IS NOT NULL) OR ((auth.uid() IS NULL) AND (user_id IS NULL)))
+chat_rooms
+ INSERT
+ Enable insert for users based on user_id
+ Applied to:public role
+  (( SELECT auth.uid() AS uid) = user_id)
 
+ SELECT
+ Enable users to view their own data only
+ Applied to:authenticated role
+ (( SELECT auth.uid() AS uid) = user_id)
 
+messages
+ INSERT
+ Enable insert for users based on user_id
+ Applied to:public role
+  ((auth.uid() IS NOT NULL) OR (is_ai = true))
+
+ SELECT
+ Enable read access for all users
+ Applied to:public role
+ true
+
+users
+ INSERT
+ Enable insert for users based on user_id
+ Applied to:public role
+ (( SELECT auth.uid() AS uid) = id)
+
+ SELECT
+ Enable users to view their own data only
+ Applied to:authenticated role
+ (( SELECT auth.uid() AS uid) = id)
 ----------------------------------
 api-proxy
 addEventListener('fetch', event => {
@@ -55,18 +83,24 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': 'http://localhost:5173',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   }
 
+  // Handle CORS preflight requests
   if (request.method === 'OPTIONS') {
-    return new Response(null, { headers })
+    return new Response(null, {
+      headers: corsHeaders
+    })
   }
 
   if (request.method !== 'POST') {
-    return new Response('Send a POST request', { status: 405, headers })
+    return new Response('Send a POST request', { 
+      status: 405, 
+      headers: corsHeaders 
+    })
   }
 
   try {
@@ -89,7 +123,7 @@ async function handleRequest(request) {
 
     return new Response(JSON.stringify(openaiData), {
       headers: {
-        ...headers,
+        ...corsHeaders,
         'Content-Type': 'application/json',
       },
     })
@@ -97,7 +131,7 @@ async function handleRequest(request) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
-        ...headers,
+        ...corsHeaders,
         'Content-Type': 'application/json',
       },
     })
